@@ -71,11 +71,15 @@ jobs:
             ${{ runner.os }}-python-${{ matrix.python-version }}-
 
       - name: Setup environment
-        run: .github/scripts/setup-environment.sh
+        run: |
+          chmod +x .github/scripts/setup-environment.sh
+          .github/scripts/setup-environment.sh
 
       - name: Build and prepare for testing
         id: version
-        run: .github/scripts/build-and-test.sh
+        run: |
+          chmod +x .github/scripts/build-and-test.sh
+          .github/scripts/build-and-test.sh
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
