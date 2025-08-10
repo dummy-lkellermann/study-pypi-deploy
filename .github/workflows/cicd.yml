@@ -91,6 +91,7 @@ jobs:
 
 
   deploy-to-test-pypi:
+    needs: [build]
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'deploy-test-pypi'
     runs-on: ubuntu-latest
 
