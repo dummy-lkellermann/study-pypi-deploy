@@ -40,7 +40,7 @@ main() {
 
     # Install security scan tools
     log_info "Installing security scan tools..."
-    pip install bandit[toml] safety gitguardian
+    pip install bandit[toml] safety ggshield
 
     log_info "Environment setup completed successfully!"
 }
