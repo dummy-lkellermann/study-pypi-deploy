@@ -1,0 +1,121 @@
+name: CI/CD Pipeline
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Actions to perform"
+        required: true
+        type: choice
+        options:
+          - ci-only
+          - deploy-test-pypi
+          - deploy-production-pypi
+        default: ci-only
+      reason:
+        description: "Reason for manual trigger"
+        required: false
+        default: "Manual trigger."
+permissions:
+  contents: write          # Required for creating tags and releases
+  pull-requests: read      # Required for PR approval checking
+  actions: read           # Required for downloading artifacts
+  issues: write           # Required for creating issues (rollback scenarios)
+  repository-projects: read # Required for project access
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event.inputs.action || 'ci' }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: '3.12'
+
+jobs:
+  check-changes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Run Command To Check changes (just pretending)
+        id: changes
+        run: |
+          ls -lha
+          echo "Of course files changed a bit"
+
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.12']
+
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for better SonarCloud analysis
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/pip
+            .venv
+          key: ${{ runner.os }}-python-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-python-${{ matrix.python-version }}-
+
+      - name: Setup environment
+        run: .github/scripts/setup-environment.sh
+
+      - name: Build and prepare for testing
+        id: version
+        run: .github/scripts/build-and-test.sh
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: distribution-packages-${{ steps.version.outputs.version }}
+          path: dist/
+          retention-days: 15
+
+
+
+  deploy-to-test-pypi:
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'deploy-test-pypi'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: distribution-packages-${{ needs.build.outputs.version }}
+          path: dist/
+
+      - name: Deploy to Test PyPI
+        #env:
+        #  TEST_PYPI_API_TOKEN: ${{ secrets.TEST_PYPI_API_TOKEN }}
+        run: | # "#.github/scripts/deploy-to-pypi.sh test "${{ needs.continuous-integration.outputs.version }}"
+          echo "Deploy to test pypi"
+
+      - name: Rollback on deployment failure
+        if: failure()
+        run: | #.github/scripts/rollback.sh
+          echo "Rollback"
+

@@ -1,0 +1,25 @@
+version: "3"
+tasks:
+  build:
+    desc: "Build package distribution"
+    cmds:
+      - "python3 -m build"
+
+  clean:
+    desc: "Clean up build artifacts, cache files, and temporary files"
+    cmds:
+      - rm -rf build/
+      - rm -rf dist/
+      - rm -rf *.egg-info/
+      - rm -rf .pytest_cache/
+      - rm -rf htmlcov/
+      - rm -rf .coverage
+      - rm -rf .ruff_cache/
+      - rm -rf src/__pycache__/
+      - rm -rf tests/__pycache__/
+
+  build:clean:
+    desc: "Clean build artifacts and rebuild"
+    cmds:
+      - task: clean
+      - task: build
