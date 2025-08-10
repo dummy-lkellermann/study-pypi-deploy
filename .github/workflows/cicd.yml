@@ -83,7 +83,7 @@ jobs:
           .github/scripts/build-and-test.sh
 
       - name: Test
-        run: echo "Here we run lint, pytest, security scans... ""
+        run: echo "Here we run lint, pytest, security scans... "
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
