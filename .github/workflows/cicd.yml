@@ -82,13 +82,20 @@ jobs:
           chmod +x .github/scripts/build-and-test.sh
           .github/scripts/build-and-test.sh
 
+      - name: Test
+        run: echo "Here we run lint, pytest, security scans... ""
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: distribution-packages-${{ steps.version.outputs.version }}
           path: dist/
           retention-days: 15
-
+      - name: Tagging
+        if: github.event.inputs.action == 'deploy-test-pypi' || github.event.inputs.action == 'deploy-production-pypi'
+        run: |
+          chmod +x .github/scripts/create-git-tag.sh
+          .github/scripts/create-git-tag.sh "${{ steps.version.outputs.version }}" "${{ github.event.inputs.action }}"
 
 
   deploy-to-test-pypi:
