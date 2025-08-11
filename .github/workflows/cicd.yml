@@ -122,10 +122,12 @@ jobs:
           path: dist/
 
       - name: Deploy to Test PyPI
-        #env:
-        #  TEST_PYPI_API_TOKEN: ${{ secrets.TEST_PYPI_API_TOKEN }}
-        run: | # "#.github/scripts/deploy-to-pypi.sh test "${{ needs.continuous-integration.outputs.version }}"
+        env:
+          TEST_PYPI_API_TOKEN: ${{ secrets.TEST_PYPI_API_TOKEN }}
+        run: |
           echo "Deploy to test pypi"
+          chmod +x .github/scripts/deploy-to-pypi.sh test "${{ needs.build.outputs.version }}"
+
 
       - name: Rollback on deployment failure
         if: failure()
