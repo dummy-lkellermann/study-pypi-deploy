@@ -99,8 +99,8 @@ jobs:
 
 
   deploy-to-test-pypi:
-    needs: [build]
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'deploy-test-pypi' && startsWith(github.ref, 'refs/tags')
+    needs: [build] #&& startsWith(github.ref, 'refs/tags')
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'deploy-test-pypi'
     runs-on: ubuntu-latest
 
     steps:
@@ -109,6 +109,11 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
+      - name: run command
+        run: |
+          echo ${{ github.ref }}
+          echo "##############"
+          echo ${{github}}
 
       #- name: Set up Python
       #  uses: actions/setup-python@v5
