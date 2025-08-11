@@ -126,7 +126,8 @@ jobs:
           TEST_PYPI_API_TOKEN: ${{ secrets.TEST_PYPI_API_TOKEN }}
         run: |
           echo "Deploy to test pypi"
-          chmod +x .github/scripts/deploy-to-pypi.sh test "${{ needs.build.outputs.version }}"
+          chmod +x .github/scripts/deploy-to-pypi.sh
+          .github/scripts/deploy-to-pypi.sh test "${{ needs.build.outputs.version }}"
 
 
       - name: Rollback on deployment failure
