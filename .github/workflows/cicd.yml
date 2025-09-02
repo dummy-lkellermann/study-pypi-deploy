@@ -41,7 +41,8 @@ jobs:
           ls -lha
           echo "Of course files changed a bit"
 
-  build:
+  test-build:
+    needs: [check-changes]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -108,7 +109,7 @@ jobs:
 
 
   delivery-package:
-    needs: [build] #&& startsWith(github.ref, 'refs/tags')
+    needs: [test-build] #&& startsWith(github.ref, 'refs/tags')
     if: github.event_name == 'workflow_dispatch' && (github.event.inputs.action == 'deploy-test-pypi' || github.event.inputs.action == 'deploy-production-pypi')
     runs-on: ubuntu-latest
     steps:
