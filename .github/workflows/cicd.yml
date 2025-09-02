@@ -16,12 +16,12 @@ on:
         required: false
         default: "Manual trigger."
 permissions:
-  contents: write          # Required for creating tags and releases
-  pull-requests: read      # Required for PR approval checking
-  actions: read           # Required for downloading artifacts
-  issues: write           # Required for creating issues (rollback scenarios)
+  contents: write           # Required for creating tags and releases
+  pull-requests: read       # Required for PR approval checking
+  actions: read             # Required for downloading artifacts
+  issues: write             # Required for creating issues (rollback scenarios)
   repository-projects: read # Required for project access
-
+  id-token: write           # Required for trusted publishing on PyPi
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event.inputs.action || 'ci' }}
   cancel-in-progress: true
@@ -98,27 +98,16 @@ jobs:
           .github/scripts/create-git-tag.sh "${{ steps.version.outputs.version }}" "${{ github.event.inputs.action }}"
 
 
-  deploy-to-test-pypi:
+  delivery-package:
     needs: [build] #&& startsWith(github.ref, 'refs/tags')
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'deploy-test-pypi'
+    if: github.event_name == 'workflow_dispatch' && (github.event.inputs.action == 'deploy-test-pypi' || github.event.inputs.action == 'deploy-production-pypi')
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
-      - name: run command
-        run: |
-          echo ${{ github.ref }}
-          echo "##############"
-          echo ${{github}}
-
-      #- name: Set up Python
-      #  uses: actions/setup-python@v5
-      #  with:
-      #    python-version: "3.12"
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -128,12 +117,12 @@ jobs:
 
       - name: Upload to Test PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
+        if: github.event.inputs.action == 'deploy-test-pypi'
         with:
-          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
           repository-url: https://test.pypi.org/legacy/
 
-      - name: Rollback on deployment failure
-        if: failure()
-        run: | #.github/scripts/rollback.sh
-          echo "Rollback"
+      - name: Upload to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        if: github.event.inputs.action == 'deploy-production-pypi'
+
 

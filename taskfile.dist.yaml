@@ -1,4 +1,11 @@
 version: "3"
+
+vars:
+  PYTHON: python3
+  VENV_DIR: .venv
+  SRC_DIR: src
+  TESTS_DIR: tests
+
 tasks:
   build:
     desc: "Build package distribution"
@@ -23,3 +30,7 @@ tasks:
     cmds:
       - task: clean
       - task: build
+  test:cov:
+    desc: "Run tests with coverage report"
+    cmds:
+      - "{{.VENV_DIR}}/bin/python -m pytest {{.TESTS_DIR}}/  --cov-report=term-missing --cov-report=html:calc_cov --cov-report=xml --cov"
