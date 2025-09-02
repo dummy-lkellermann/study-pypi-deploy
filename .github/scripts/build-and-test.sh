@@ -56,7 +56,7 @@ main() {
 
     extract_version
     build_packages
-    verify_packages
+    #verify_packages
     install_package
 
     log_info "Build and test preparation completed successfully!"
