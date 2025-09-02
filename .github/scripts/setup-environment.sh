@@ -35,6 +35,9 @@ main() {
     log_info "Installing build tools..."
     pip install build
 
+    # Install test tools:
+    log_info "Test tools"
+    pip install pytest pytest-cov
     # Install project dependencies
     log_info "Installing project dependencies..."
     pip install -r requirements.txt
