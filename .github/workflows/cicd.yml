@@ -87,6 +87,10 @@ jobs:
         run: echo "Here we run lint, pytest, security scans... "
       - name: List files
         run: ls -lha
+      - name: List files under tests
+        run: ls -lha tests
+      - name: Cat test file
+        run: cat tests/test_example.py
       - name: Cat pyproject.toml content
         run: cat pyproject.toml
       - name: GitGuardian Scan
