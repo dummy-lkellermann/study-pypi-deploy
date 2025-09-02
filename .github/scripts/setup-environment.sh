@@ -30,10 +30,6 @@ main() {
     log_info "Upgrading pip..."
     python -m pip install --upgrade pip
 
-    # Install build tools
-    log_info "Installing build tools..."
-    pip install build twine
-
     # Install project dependencies
     log_info "Installing project dependencies..."
     pip install -r requirements.txt
@@ -41,6 +37,9 @@ main() {
     # Install security scan tools
     log_info "Installing security scan tools..."
     pip install bandit[toml] safety ggshield
+
+    log_info "Other required tools"
+    pip install go-task-bin
 
     log_info "Environment setup completed successfully!"
 }
