@@ -43,9 +43,6 @@ main() {
     log_info "Installing security scan tools..."
     pip install bandit[toml] safety ggshield
 
-    log_info "Other required tools"
-    pip install go-task-bin
-
     log_info "Environment setup completed successfully!"
 }
 
