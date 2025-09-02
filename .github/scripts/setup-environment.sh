@@ -30,6 +30,11 @@ main() {
     log_info "Upgrading pip..."
     python -m pip install --upgrade pip
 
+
+    # Install build tools
+    log_info "Installing build tools..."
+    pip install build
+
     # Install project dependencies
     log_info "Installing project dependencies..."
     pip install -r requirements.txt
