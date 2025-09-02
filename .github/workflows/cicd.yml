@@ -85,7 +85,10 @@ jobs:
 
       - name: Test
         run: echo "Here we run lint, pytest, security scans... "
-
+      - name: List files
+        run: ls -lha
+      - name: Cat pyproject.toml content
+        run: cat pyproject.toml
       - name: GitGuardian Scan
         uses: GitGuardian/ggshield/actions/secret@v1.43.0
         env:
