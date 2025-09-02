@@ -33,4 +33,4 @@ tasks:
   test:cov:
     desc: "Run tests with coverage report"
     cmds:
-      - "{{.VENV_DIR}}/bin/python -m pytest {{.TESTS_DIR}}/  --cov-report=term-missing --cov-report=html:calc_cov --cov-report=xml --cov"
+      - "{{.VENV_DIR}}/bin/python -m pytest"

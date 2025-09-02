@@ -21,25 +21,25 @@ license-files = ["LICEN[CS]E*"]
 [project.urls]
 Homepage = "https://github.com/lkellermann/study-pypi-deploy"
 
-#[tool.pytest.ini_options]
-#testpaths = ["tests"]
-#python_files = ["test_*.py", "*_test.py"]
-#python_classes = ["Test*"]
-#python_functions = ["test_*"]
-#addopts = [
-#    "--cov-report=term-missing",
-#    "--cov-report=html",
-#    "--cov-report=xml:coverage.xml",
-#    "--strict-markers",
-#    "--disable-warnings",
-#]
-#markers = [
-#    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
-#    "integration: marks tests as integration tests",
-#]
-#
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--cov=src/study_pypi_deploy",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=xml:coverage.xml",
+    "--strict-markers",
+    "--disable-warnings",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+]
+
 [tool.coverage.run]
-#source = "src/study_pypi_deploy"
 relative_files = true
 branch = true
 omit = [
@@ -48,19 +48,20 @@ omit = [
     "*/__pycache__/*",
 ]
 
-#[tool.coverage.xml]
-#output = "coverage.xml"
-#
-#[tool.coverage.report]
-#exclude_lines = [
-#    "pragma: no cover",
-#    "def __repr__",
-#    "if self.debug:",
-#    "if settings.DEBUG",
-#    "raise AssertionError",
-#    "raise NotImplementedError",
-#    "if 0:",
-#    "if __name__ == .__main__.:",
-#    "class .*\\bProtocol\\):",
-#    "@(abc\\.)?abstractmethod",
-#]
+
+[tool.coverage.xml]
+output = "coverage.xml"
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
