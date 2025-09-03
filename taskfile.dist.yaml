@@ -7,10 +7,21 @@ vars:
   TESTS_DIR: tests
 
 tasks:
+  venv:
+    desc: "Creates Python Virtual Environment."
+    cmds:
+      - "python3 -m venv {{.VENV_DIR}}"
+      - "{{.VENV_DIR}}/bin/python -m pip install --upgrade pip"
+      - "{{.VENV_DIR}}/bin/python -m pip install -r requirements.txt"
+  venv:recreate:
+    desc: "Recreates Python virtual environment."
+    cmds:
+      - "rm -rf {{.VENV_DIR}}"
+      - task: venv
   build:
     desc: "Build package distribution"
     cmds:
-      - "python3 -m build"
+      - "{{.VENV_DIR}}/bin/python -m build"
 
   clean:
     desc: "Clean up build artifacts, cache files, and temporary files"
@@ -30,7 +41,20 @@ tasks:
     cmds:
       - task: clean
       - task: build
+
+  build:install:
+    desc: "Clean build artifacts, rebuild it and install in virtual environment."
+    cmds:
+      - task: build:clean
+      - "{{.VENV_DIR}}/bin/python -m pip install dist/*.whl"
+
   test:cov:
     desc: "Run tests with coverage report"
     cmds:
       - "{{.VENV_DIR}}/bin/python -m pytest"
+
+  test:clean:
+    desc: "Clean build artifacts, rebuild it, install in virtual environment and run tests."
+    cmds:
+      - task: build:install
+      - task: test:cov

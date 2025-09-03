@@ -27,7 +27,7 @@ python_files = ["test_*.py", "*_test.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 addopts = [
-    "--cov=src/",
+    "--cov=study_pypi_deploy",
     "--cov-report=term-missing",
     "--cov-report=html",
     "--cov-report=xml:coverage.xml",
@@ -40,6 +40,7 @@ markers = [
 ]
 
 [tool.coverage.run]
+source = ["study_pypi_deploy"]
 relative_files = true
 branch = true
 omit = [

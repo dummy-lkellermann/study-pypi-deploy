@@ -1,2 +1,5 @@
 setuptools
 pre-commit
+pytest
+pytest-cov
+build
