@@ -78,7 +78,7 @@ jobs:
           path: |
             ~/.cache/pip
             .venv
-          key: ${{ runner.os }}-python-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}
+          key: ${{ runner.os }}-python-${{ matrix.python-version }}-${{ hashFiles('**requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-python-${{ matrix.python-version }}-
 
@@ -96,17 +96,6 @@ jobs:
       - name: Run tests
         id: version
         run: task test:cov
-
-      - name: Test
-        run: echo "Here we run lint, pytest, security scans... "
-      - name: List files
-        run: ls -lha
-      - name: List files under tests
-        run: ls -lha tests
-      - name: Cat test file
-        run: cat tests/test_example.py
-      - name: Cat pyproject.toml content
-        run: cat pyproject.toml
 
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v5
