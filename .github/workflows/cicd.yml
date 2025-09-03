@@ -57,6 +57,15 @@ jobs:
           fetch-depth: 0  # Shallow clones should be disabled for better SonarCloud analysis
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: GitGuardian Scan
+        uses: GitGuardian/ggshield/actions/secret@v1.43.0
+        env:
+          GITHUB_PUSH_BEFORE_SHA: ${{ github.event.before }}
+          GITHUB_PUSH_BASE_SHA: ${{ github.event.base }}
+          GITHUB_PULL_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          GITHUB_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
+
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
@@ -73,11 +82,16 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-python-${{ matrix.python-version }}-
 
+
       - name: Install Task in OS.
         run: sudo snap install task --classic
+
       - name: Create virtual environment (if cache miss)
         if: steps.cache-venv.outputs.cache-hit != true
         run: task venv
+
+      - name: Build & Install.
+        run: task build:install
 
       - name: Run tests
         id: version
@@ -94,16 +108,6 @@ jobs:
       - name: Cat pyproject.toml content
         run: cat pyproject.toml
 
-      - name: GitGuardian Scan
-        uses: GitGuardian/ggshield/actions/secret@v1.43.0
-        env:
-          GITHUB_PUSH_BEFORE_SHA: ${{ github.event.before }}
-          GITHUB_PUSH_BASE_SHA: ${{ github.event.base }}
-          GITHUB_PULL_BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          GITHUB_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
-          GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
-      - name: "Run Pytest"
-        run: python -m pytest
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v5
         env:
