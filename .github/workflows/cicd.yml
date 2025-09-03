@@ -1,5 +1,11 @@
 name: CI/CD Pipeline
 on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       action:
@@ -32,14 +38,32 @@ env:
 jobs:
   check-changes:
     runs-on: ubuntu-latest
+    outputs:
+      python-files-changed: ${{ steps.changes.outputs.python-files-changed }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Run Command To Check changes (just pretending)
+        with:
+          fetch-depth: 0
+
+      - name: Check for changes in test-related files
         id: changes
         run: |
-          ls -lha
-          echo "Of course files changed a bit"
+          # Check if this is a manual workflow dispatch (always run tests)
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "Manual trigger - running all tests"
+            echo "python-files-changed=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # For push/PR events, check for changes in specific directories
+          if git diff --name-only HEAD~1 HEAD | grep -E '^(tests/|src/study_pypi_deploy/)' > /dev/null; then
+            echo "Changes detected in test-related files"
+            echo "python-files-changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "No changes in test-related files"
+            echo "python-files-changed=false" >> $GITHUB_OUTPUT
+          fi
 
   test-build:
     needs: [check-changes]
@@ -90,19 +114,29 @@ jobs:
         if: steps.cache-venv.outputs.cache-hit != 'true'
         run: task venv
 
+      - name: Extract version
+        id: version
+        run: |
+          VERSION=$(python -c "import tomllib; f=open('pyproject.toml','rb'); data=tomllib.load(f); print(data['project']['version'])")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Version: $VERSION"
+
       - name: Build & Install.
+        if: needs.check-changes.outputs.python-files-changed == 'true'
         run: task build:install
 
       - name: Run tests
-        id: version
+        if: needs.check-changes.outputs.python-files-changed == 'true'
         run: task test:cov
 
       - name: SonarQube Scan
+        if: needs.check-changes.outputs.python-files-changed == 'true'
         uses: SonarSource/sonarqube-scan-action@v5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Upload build artifacts
+        if: needs.check-changes.outputs.python-files-changed == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: distribution-packages-${{ steps.version.outputs.version }}
