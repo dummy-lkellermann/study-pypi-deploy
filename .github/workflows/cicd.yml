@@ -87,7 +87,7 @@ jobs:
         run: sudo snap install task --classic
 
       - name: Create virtual environment (if cache miss)
-        if: steps.cache-venv.outputs.cache-hit != true
+        if: steps.cache-venv.outputs.cache-hit != 'true'
         run: task venv
 
       - name: Build & Install.
