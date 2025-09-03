@@ -49,6 +49,12 @@ omit = [
     "*/__pycache__/*",
 ]
 
+[tool.coverage.paths]
+source = [
+    "src/study_pypi_deploy/",
+    "*/site-packages/study_pypi_deploy/",
+    ".venv/lib/python*/site-packages/study_pypi_deploy/",
+]
 
 [tool.coverage.xml]
 output = "coverage.xml"
