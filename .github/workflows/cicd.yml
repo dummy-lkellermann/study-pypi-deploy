@@ -29,7 +29,7 @@ on:
         default: "Manual trigger."
 permissions:
   contents: write           # Required for creating tags and releases
-  pull-requests: read       # Required for PR approval checking
+  pull-requests: write       # Required for PR approval checking
   actions: read             # Required for downloading artifacts
   issues: write             # Required for creating issues (rollback scenarios)
   repository-projects: read # Required for project access
