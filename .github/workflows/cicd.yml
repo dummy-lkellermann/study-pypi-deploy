@@ -6,6 +6,12 @@ on:
   pull_request:
     branches:
       - main
+  pull_request_target:
+    types:
+      - opened
+      - synchronize
+      - reopened
+
   workflow_dispatch:
     inputs:
       action:
@@ -72,7 +78,10 @@ jobs:
         with:
           fetch-depth: 0  # Shallow clones should be disabled for better SonarCloud analysis
           token: ${{ secrets.GITHUB_TOKEN }}
-
+      - name: Print variables
+        run: |
+          echo "github.event.pull_request.head.repo.full_name: ${{ github.event.pull_request.head.repo.full_name }}"
+          echo "github.repository: ${{ github.repository }}"
       - name: GitGuardian Scan
         uses: GitGuardian/ggshield/actions/secret@v1.43.0
         env:
